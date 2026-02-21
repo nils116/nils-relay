@@ -1,6 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
 import { store, LocationData } from "@/lib/store";
 
+// Parse location from various formats
+function parseLocation(body: any): { lat: number; lon: number; accuracy?: number; placeName?: string } | null {
+  // If lat/lon are provided directly
+  if (typeof body.lat === "number" && typeof body.lon === "number") {
+    return {
+      lat: body.lat,
+      lon: body.lon,
+      accuracy: body.accuracy,
+      placeName: body.placeName,
+    };
+  }
+
+  // If location is sent as a string (Shortcuts "Current Location")
+  if (typeof body.location === "string") {
+    // Try to parse "Lat: 50.1109, Lon: 8.6821" format
+    const latMatch = body.location.match(/Lat:\s*(-?\d+\.?\d*)/i);
+    const lonMatch = body.location.match(/Lon:\s*(-?\d+\.?\d*)/i);
+    
+    if (latMatch && lonMatch) {
+      return {
+        lat: parseFloat(latMatch[1]),
+        lon: parseFloat(lonMatch[1]),
+        accuracy: body.accuracy,
+        placeName: body.placeName,
+      };
+    }
+
+    // Try to parse comma-separated "50.1109, 8.6821" format
+    const coords = body.location.match(/(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)/);
+    if (coords) {
+      return {
+        lat: parseFloat(coords[1]),
+        lon: parseFloat(coords[2]),
+        accuracy: body.accuracy,
+        placeName: body.placeName,
+      };
+    }
+  }
+
+  return null;
+}
+
 // GET /api/location - Get latest location
 export async function GET() {
   if (!store.location) {
@@ -21,22 +63,24 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    // Validate required fields
-    if (typeof body.lat !== "number" || typeof body.lon !== "number") {
+    // Parse location from various formats
+    const parsed = parseLocation(body);
+    
+    if (!parsed) {
       return NextResponse.json(
-        { error: "Missing required fields: lat, lon" },
+        { error: "Could not parse location. Send {location: 'Current Location'} or {lat: 50, lon: 8}" },
         { status: 400 }
       );
     }
 
     const locationData: LocationData = {
-      lat: body.lat,
-      lon: body.lon,
-      accuracy: body.accuracy,
+      lat: parsed.lat,
+      lon: parsed.lon,
+      accuracy: parsed.accuracy,
       timestamp: body.timestamp || new Date().toISOString(),
       source: body.source || "ios-shortcut",
       battery: body.battery,
-      placeName: body.placeName,
+      placeName: parsed.placeName || body.placeName,
     };
 
     // Update store
@@ -52,7 +96,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("[Location Error]", error);
     return NextResponse.json(
-      { error: "Invalid JSON body" },
+      { error: "Invalid request" },
       { status: 400 }
     );
   }
