@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { store, LocationData } from "@/lib/store";
 
+// API key validation
+const API_KEY = process.env.API_KEY;
+
+function validateAuth(request: NextRequest): boolean {
+  // Allow if no API_KEY is set (development mode)
+  if (!API_KEY) return true;
+  
+  const authHeader = request.headers.get("x-api-key");
+  return authHeader === API_KEY;
+}
+
 // Parse location from various formats
 function parseLocation(body: any): { lat?: number; lon?: number; accuracy?: number; placeName?: string } | null {
   // If lat/lon are provided directly
@@ -63,7 +74,15 @@ function parseLocation(body: any): { lat?: number; lon?: number; accuracy?: numb
 }
 
 // GET /api/location - Get latest location
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Check auth
+  if (!validateAuth(request)) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   if (!store.location) {
     return NextResponse.json(
       { error: "No location data available" },
@@ -79,6 +98,14 @@ export async function GET() {
 
 // POST /api/location - Update location
 export async function POST(request: NextRequest) {
+  // Check auth
+  if (!validateAuth(request)) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   try {
     const body = await request.json();
     

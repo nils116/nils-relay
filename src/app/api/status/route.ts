@@ -14,13 +14,14 @@ export async function GET() {
       location: {
         get: "/api/location",
         post: "/api/location",
-        description: "Get or update location data",
+        description: "Get or update location data (requires x-api-key header)",
       },
       ping: {
         get: "/api/ping?type=<type>&limit=<n>",
         post: "/api/ping",
-        description: "Get or send ping events",
+        description: "Get or send ping events (requires x-api-key header)",
       },
     },
+    security: "API key required via x-api-key header",
   });
 }
