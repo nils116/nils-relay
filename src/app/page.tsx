@@ -62,7 +62,7 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="bg-yellow-50 border border-yellow-200 rounded-lg p-4"㻢>
+          <section className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <h2 className="font-semibold mb-2 text-yellow-800">⚠️ Note</h2>
             <p className="text-sm text-yellow-700">
               Data is stored in-memory and resets on server restart. 
