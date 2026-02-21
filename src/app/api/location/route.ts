@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { store, LocationData } from "@/lib/store";
 
 // Parse location from various formats
-function parseLocation(body: any): { lat: number; lon: number; accuracy?: number; placeName?: string } | null {
+function parseLocation(body: any): { lat?: number; lon?: number; accuracy?: number; placeName?: string } | null {
   // If lat/lon are provided directly
   if (typeof body.lat === "number" && typeof body.lon === "number") {
     return {
@@ -38,6 +38,25 @@ function parseLocation(body: any): { lat: number; lon: number; accuracy?: number
         placeName: body.placeName,
       };
     }
+    
+    // If it looks like a street address (contains letters, not just numbers/commas)
+    // Store it as placeName without coordinates
+    if (/[a-zA-Z]/.test(body.location)) {
+      return {
+        placeName: body.location,
+        accuracy: body.accuracy,
+      };
+    }
+  }
+
+  // If address is provided in placeName field
+  if (typeof body.placeName === "string" && body.placeName.length > 0) {
+    return {
+      lat: body.lat,
+      lon: body.lon,
+      accuracy: body.accuracy,
+      placeName: body.placeName,
+    };
   }
 
   return null;
@@ -74,13 +93,13 @@ export async function POST(request: NextRequest) {
     }
 
     const locationData: LocationData = {
-      lat: parsed.lat,
-      lon: parsed.lon,
+      lat: parsed.lat || 0,
+      lon: parsed.lon || 0,
       accuracy: parsed.accuracy,
       timestamp: body.timestamp || new Date().toISOString(),
       source: body.source || "ios-shortcut",
       battery: body.battery,
-      placeName: parsed.placeName || body.placeName,
+      placeName: parsed.placeName || "Unknown location",
     };
 
     // Update store

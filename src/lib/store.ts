@@ -3,8 +3,8 @@
 // Upgrade path: Use Vercel KV or Upstash Redis for persistence
 
 export interface LocationData {
-  lat: number;
-  lon: number;
+  lat?: number;
+  lon?: number;
   accuracy?: number;
   timestamp: string;
   source: string;
