@@ -145,7 +145,7 @@ export default function MissionControl() {
                 }`}
               >
                 {tab.label}
-                {tab.count > 0 && (
+                {tab.count != null && tab.count > 0 && (
                   <span className="ml-2 px-2 py-0.5 bg-cyan-500/20 text-cyan-400 text-xs rounded-full">
                     {tab.count}
                   </span>
