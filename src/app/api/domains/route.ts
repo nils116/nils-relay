@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const API_KEY = process.env.API_KEY;
-
 function validateAuth(request: NextRequest): boolean {
+  const API_KEY = process.env.API_KEY;
   if (!API_KEY) return true;
   const authHeader = request.headers.get("x-api-key") || request.headers.get("authorization")?.replace("Bearer ", "");
   return authHeader === API_KEY;

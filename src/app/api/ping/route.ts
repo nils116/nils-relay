@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { store, PingData } from "@/lib/store";
 
 // API key validation
-const API_KEY = process.env.API_KEY;
-
 function validateAuth(request: NextRequest): boolean {
+  const API_KEY = process.env.API_KEY;
   // Allow if no API_KEY is set (development mode)
   if (!API_KEY) return true;
   
