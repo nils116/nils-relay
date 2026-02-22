@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 function validateAuth(request: NextRequest): boolean {
   const API_KEY = process.env.API_KEY;
+  console.log("API_KEY present:", !!API_KEY);
   if (!API_KEY) return true;
   const authHeader = request.headers.get("x-api-key") || request.headers.get("authorization")?.replace("Bearer ", "");
   return authHeader === API_KEY;
@@ -9,8 +10,10 @@ function validateAuth(request: NextRequest): boolean {
 
 // GET /api/tasks - List all tasks from memory/active-tasks.md
 export async function GET(request: NextRequest) {
+  console.log("Request headers:", Object.fromEntries(request.headers.entries()));
+  
   if (!validateAuth(request)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized", debug: process.env.VERCEL_ENV }, { status: 401 });
   }
 
   // Real tasks from active-tasks.md
