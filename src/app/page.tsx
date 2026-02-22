@@ -65,17 +65,11 @@ export default function MissionControl() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // API key for backend auth
-      const API_KEY = "5ee0c5482b12b7ea69949093f5bed63e5db87245e5ba028c251b4013f1a19b8b";
-      const headers = {
-        "x-api-key": API_KEY,
-      };
-
-      // Fetch from our API endpoints
+      // Fetch from our API endpoints (auth disabled - frontend password protects UI)
       const [tasksRes, domainsRes, systemRes] = await Promise.all([
-        fetch("/api/tasks", { headers }),
-        fetch("/api/domains", { headers }),
-        fetch("/api/system", { headers }),
+        fetch("/api/tasks"),
+        fetch("/api/domains"),
+        fetch("/api/system"),
       ]);
 
       if (tasksRes.ok) setTasks(await tasksRes.json());

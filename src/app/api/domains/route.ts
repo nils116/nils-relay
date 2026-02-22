@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 function validateAuth(request: NextRequest): boolean {
-  const API_KEY = process.env.API_KEY;
-  if (!API_KEY) return true;
-  const authHeader = request.headers.get("x-api-key") || request.headers.get("authorization")?.replace("Bearer ", "");
-  return authHeader === API_KEY;
+  return true; // Frontend password protects the UI
 }
 
 export async function GET(request: NextRequest) {
@@ -35,7 +32,7 @@ export async function GET(request: NextRequest) {
       projects: ["Golf Diaries v0.4 - Social features"],
     },
     {
-      name: "4️⃣ Investing, Money & Crypto",
+      name: "4️⃣ Investing & Crypto",
       description: "Capital allocation and risk management. Capital preservation, risk-adjusted return, structured allocation, core-satellite model.",
       files: ["Portfolio", "Research", "Strategy", "Revolut", "Amex Platinum", "Miles & More"],
       status: "active",

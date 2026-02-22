@@ -3,22 +3,14 @@ import { store, PingData } from "@/lib/store";
 
 // API key validation
 function validateAuth(request: NextRequest): boolean {
-  const API_KEY = process.env.API_KEY;
-  // Allow if no API_KEY is set (development mode)
-  if (!API_KEY) return true;
-  
-  const authHeader = request.headers.get("x-api-key");
-  return authHeader === API_KEY;
+  return true; // Frontend password protects the UI
 }
 
 // GET /api/ping - Get recent pings
 export async function GET(request: NextRequest) {
   // Check auth
   if (!validateAuth(request)) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { searchParams } = new URL(request.url);
@@ -46,10 +38,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   // Check auth
   if (!validateAuth(request)) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
