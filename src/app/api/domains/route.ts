@@ -13,26 +13,39 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Real domains from workspace/domains/ and ntd-consulting/
   const domains = [
     {
-      name: "NTD Consulting",
-      description: "Innovation lab, product prototyping, app development, AI systems",
+      name: "1️⃣ Worlds Finest (WF)",
+      description: "Luxury real estate and strategic development. Strategic planning, investor communication, market research, operational systems, AI integration, event planning.",
+      files: ["Domain overview", "Projects", "Contacts", "wf-salesportal repo"],
+      status: "active",
+    },
+    {
+      name: "2️⃣ NTD Consulting",
+      description: "Innovation lab and product builds. App development, AI systems, technical architecture, revenue model design, sprint planning.",
       files: ["README.md", "DESIGN.md", "TECH-STACK.md", "ACTIVE-PROJECTS.md", "PRODUCT-BUILD-LOG.md"],
+      status: "active",
+      projects: ["BYD Champion game", "nils-relay endpoint", "Mission Control Center"],
     },
     {
-      name: "Worlds Finest (WF)",
-      description: "Luxury real estate, strategic development, investor relations",
-      files: ["Domain overview", "Projects", "Contacts"],
+      name: "3️⃣ Health & Performance",
+      description: "Long-term optimization. Longevity, strength, running, golf performance, sustainable lifestyle.",
+      files: ["Training logs", "Golf Diaries app (golfdiaries-ccode)", "Apple Health data", "Whoop recovery"],
+      status: "active",
+      projects: ["Golf Diaries v0.4 - Social features"],
     },
     {
-      name: "Health & Performance",
-      description: "Longevity, strength, running, golf performance tracking",
-      files: ["Training logs", "Golf Diaries app", "Health metrics"],
+      name: "4️⃣ Investing, Money & Crypto",
+      description: "Capital allocation and risk management. Capital preservation, risk-adjusted return, structured allocation, core-satellite model.",
+      files: ["Portfolio", "Research", "Strategy", "Revolut", "Amex Platinum", "Miles & More"],
+      status: "active",
     },
     {
-      name: "Investing & Crypto",
-      description: "Capital allocation, risk management, crypto exposure",
-      files: ["Portfolio", "Research", "Strategy"],
+      name: "5️⃣ Weckmarkt IV & Abroad",
+      description: "Shared life operations with girlfriend. Home management, travel planning, shared projects, annual planning.",
+      files: ["Travel plans", "Home management", "Shared projects"],
+      status: "active",
     },
   ];
 

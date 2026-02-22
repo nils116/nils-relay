@@ -14,13 +14,33 @@ interface Domain {
   name: string;
   description: string;
   files: string[];
+  status?: string;
+  projects?: string[];
 }
 
 interface SystemInfo {
   version: string;
   model: string;
   workspace: string;
+  host?: string;
+  node?: string;
   uptime: string;
+  memory?: {
+    flushEnabled: boolean;
+    flushThreshold: string;
+    contextPruning: string;
+    hybridSearch: string;
+    sessionIndexing: boolean;
+    sources: string[];
+  };
+  models?: Array<{
+    name: string;
+    id: string;
+    context: string;
+    primary: boolean;
+  }>;
+  channels?: Record<string, string>;
+  plugins?: string[];
 }
 
 export default function MissionControl() {
@@ -247,27 +267,54 @@ function TasksBoard({ tasks }: { tasks: Task[] }) {
 // Domains View
 function DomainsView({ domains }: { domains: Domain[] }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 gap-4">
       {domains.map((domain) => (
         <div
           key={domain.name}
           className="bg-slate-900 border border-slate-700 rounded-xl p-6 hover:border-cyan-500/30 transition-colors"
         >
-          <h3 className="text-lg font-semibold text-cyan-400 mb-2">{domain.name}</h3>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-lg font-semibold text-cyan-400">{domain.name}</h3>
+            {domain.status && (
+              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                domain.status === "active" 
+                  ? "bg-green-500/20 text-green-400" 
+                  : "bg-slate-700 text-slate-400"
+              }`}>
+                {domain.status}
+              </span>
+            )}
+          </div>
           <p className="text-slate-400 text-sm mb-4">{domain.description}</p>
 
-          <div className="space-y-2">
-            {domain.files.map((file) => (
-              <div
-                key={file}
-                className="flex items-center gap-2 text-sm text-slate-500"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                {file}
+          {domain.projects && domain.projects.length > 0 && (
+            <div className="mb-4">
+              <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2">Active Projects</h4>
+              <div className="flex flex-wrap gap-2">
+                {domain.projects.map((project) => (
+                  <span key={project} className="text-xs bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded">
+                    {project}
+                  </span>
+                ))}
               </div>
-            ))}
+            </div>
+          )}
+
+          <div>
+            <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2">Key Files</h4>
+            <div className="space-y-1">
+              {domain.files.map((file) => (
+                <div
+                  key={file}
+                  className="flex items-center gap-2 text-sm text-slate-500"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  {file}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       ))}
@@ -291,12 +338,16 @@ function SystemView({ info }: { info: SystemInfo }) {
             <span>{info.model}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-400">Workspace</span>
-            <span className="text-xs">{info.workspace}</span>
+            <span className="text-slate-400">Host</span>
+            <span className="text-xs">{info.host}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-400">Uptime</span>
-            <span>{info.uptime}</span>
+            <span className="text-slate-400">Node</span>
+            <span className="text-xs">{info.node}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-slate-400">Workspace</span>
+            <span className="text-xs">{info.workspace}</span>
           </div>
         </div>
       </div>
@@ -323,27 +374,46 @@ function SystemView({ info }: { info: SystemInfo }) {
         </div>
       </div>
 
-      <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 md:col-span-2">
-        <h3 className="text-lg font-semibold text-cyan-400 mb-4">📊 Memory Status</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-slate-800 p-4 rounded-lg text-center">
-            <div className="text-2xl font-bold text-cyan-400">40k</div>
-            <div className="text-xs text-slate-400">Flush Threshold</div>
-          </div>
-          <div className="bg-slate-800 p-4 rounded-lg text-center">
-            <div className="text-2xl font-bold text-cyan-400">6h</div>
-            <div className="text-xs text-slate-400">Context TTL</div>
-          </div>
-          <div className="bg-slate-800 p-4 rounded-lg text-center">
-            <div className="text-2xl font-bold text-cyan-400">ON</div>
-            <div className="text-xs text-slate-400">Session Indexing</div>
-          </div>
-          <div className="bg-slate-800 p-4 rounded-lg text-center">
-            <div className="text-2xl font-bold text-cyan-400">Hybrid</div>
-            <div className="text-xs text-slate-400">Search Mode</div>
+      {info.memory && (
+        <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 md:col-span-2">
+          <h3 className="text-lg font-semibold text-cyan-400 mb-4">📊 Memory Status</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-slate-800 p-4 rounded-lg text-center">
+              <div className="text-2xl font-bold text-cyan-400">{info.memory.flushThreshold}</div>
+              <div className="text-xs text-slate-400">Flush Threshold</div>
+            </div>
+            <div className="bg-slate-800 p-4 rounded-lg text-center">
+              <div className="text-2xl font-bold text-cyan-400">{info.memory.contextPruning}</div>
+              <div className="text-xs text-slate-400">Context TTL</div>
+            </div>
+            <div className="bg-slate-800 p-4 rounded-lg text-center">
+              <div className="text-2xl font-bold text-cyan-400">{info.memory.sessionIndexing ? "ON" : "OFF"}</div>
+              <div className="text-xs text-slate-400">Session Indexing</div>
+            </div>
+            <div className="bg-slate-800 p-4 rounded-lg text-center">
+              <div className="text-2xl font-bold text-cyan-400">Hybrid</div>
+              <div className="text-xs text-slate-400">Search Mode</div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {info.models && (
+        <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 md:col-span-2">
+          <h3 className="text-lg font-semibold text-cyan-400 mb-4">🧠 Available Models</h3>
+          <div className="space-y-2">
+            {info.models.map((model) => (
+              <div key={model.id} className="flex items-center justify-between bg-slate-800 p-3 rounded-lg">
+                <div>
+                  <span className="font-medium">{model.name}</span>
+                  {model.primary && <span className="ml-2 text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded">Primary</span>}
+                </div>
+                <span className="text-sm text-slate-400">{model.context} context</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
